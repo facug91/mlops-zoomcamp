@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+mlops-zoomcamp/
+notebooks/data/
+notebooks/models/
+soft/
