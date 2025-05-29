@@ -176,5 +176,12 @@ cython_debug/
 mlops-zoomcamp/
 notebooks/
 soft/
-01-intro/data/
-01-intro/models/
+**/artifacts/
+**/data/
+**/models/
+**/mlruns/
+**/output/
+**/mlflow.db
+
+
+
