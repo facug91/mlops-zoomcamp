@@ -1,21 +1,12 @@
+import batch
+
 import pandas as pd
+import os
 
-from datetime import datetime
+from deepdiff import DeepDiff
 
-def dt(hour, minute, second=0):
-    return datetime(2023, 1, 1, hour, minute, second)
 
-data = [
-    (None, None, dt(1, 1), dt(1, 10)),
-    (1, 1, dt(1, 2), dt(1, 10)),
-    (1, None, dt(1, 2, 0), dt(1, 2, 59)),
-    (3, 4, dt(1, 2, 0), dt(2, 2, 1)),      
-]
-
-columns = ['PULocationID', 'DOLocationID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime']
-df_input = pd.DataFrame(data, columns=columns)
-
-input_file = f's3://nyc-duration/out/2023-01.parquet'
+os.system('python batch.py 2023 1')
 
 options = {
     'client_kwargs': {
@@ -23,10 +14,22 @@ options = {
     }
 }
 
-df_input.to_parquet(
-    input_file,
-    engine='pyarrow',
-    compression=None,
-    index=False,
-    storage_options=options
-)
+df = pd.read_parquet('s3://nyc-duration/out/2023-01.parquet', storage_options=options)
+
+actual_result = df.to_dict()
+
+expected_result = {
+    'ride_id': {
+        0: '2023/01_0', 
+        1: '2023/01_1'
+    },
+    'predicted_duration': {
+        0: 23.197149, 
+        1: 13.080101
+    }
+}
+
+diff = DeepDiff(actual_result, expected_result, significant_digits=6)
+
+assert 'type_changes' not in diff
+assert 'values_changed' not in diff
